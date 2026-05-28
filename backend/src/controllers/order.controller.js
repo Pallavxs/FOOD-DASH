@@ -2,7 +2,23 @@ import Order from "../models/order.model.js";
 
 export const createOrder = async (req, res) => {
   try {
-    const newOrder = new Order(req.body);
+    const {
+      user,
+      restaurant,
+      items,
+      totalAmount,
+      riderLocation,
+    } = req.body;
+    
+
+    const newOrder = new Order({
+      user: user || (req.user && req.user._id),
+      restaurant,
+      items,
+      totalAmount,
+      riderLocation,
+    });
+
     const savedOrder = await newOrder.save();
     res.status(201).json(savedOrder);
   } catch (error) {
@@ -41,26 +57,44 @@ export const getOrderById = async (req, res) => {
   }
 };
 
-export const updateStatus = async (req, res) => {
+export const updateOrderStatus = async (req, res) => {
   try {
-    const { status, riderLocation } = req.body;
-    
-    const updateData = {};
-    if (status) updateData.status = status;
-    if (riderLocation) updateData.riderLocation = riderLocation;
-
+    const { status } = req.body;
+    if (!status) {
+      return res.status(400).json({ message: "Status is required" });
+    }
     const updatedOrder = await Order.findByIdAndUpdate(
       req.params.id,
-      updateData,
+      { status },
       { new: true }
     );
-    
     if (!updatedOrder) {
       return res.status(404).json({ message: "Order not found" });
     }
     res.status(200).json(updatedOrder);
   } catch (error) {
     console.error("Error updating order status:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const updateRiderLocation = async (req, res) => {
+  try {
+    const { riderLocation } = req.body;
+    if (!riderLocation) {
+      return res.status(400).json({ message: "Rider location is required" });
+    }
+    const updatedOrder = await Order.findByIdAndUpdate(
+      req.params.id,
+      { riderLocation },
+      { new: true }
+    );
+    if (!updatedOrder) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    res.status(200).json(updatedOrder);
+  } catch (error) {
+    console.error("Error updating rider location:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

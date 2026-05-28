@@ -32,8 +32,8 @@ const OrderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Pending", "Preparing", "Out for Delivery", "Delivered", "Cancelled"],
-      default: "Pending",
+      enum: ["placed", "preparing", "out_for_delivery", "delivered"],
+      default: "placed",
     },
     riderLocation: {
       lat: {

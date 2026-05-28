@@ -2,9 +2,18 @@ import mongoose from "mongoose";
 
 const MenuSchema = new mongoose.Schema(
   {
-    restaurant: String,
+    restaurant: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Restaurant",
+      required: true,
+    },
 
     name: {
+      type: String,
+      required: true,
+    },
+
+    description: {
       type: String,
       required: true,
     },
@@ -14,9 +23,13 @@ const MenuSchema = new mongoose.Schema(
       required: true,
     },
 
-    image: String,
+    image: {
+      type: String,
+      required: false,
+      trim: true,
+    },
   },
-  { timestamps: true},
+  { timestamps: true }
 );
 
 const Menu = mongoose.model("Menu", MenuSchema, "menus");

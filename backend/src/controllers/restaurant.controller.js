@@ -7,7 +7,6 @@ export async function getRestaurants(req, res) {
     const skip = (Number(page) - 1) * Number(limit);
 
     const restaurants = await Restaurant.find().skip(skip).limit(Number(limit));
-    console.log("Fetched restaurants:", restaurants);
 
     res.status(200).json({ data: restaurants });
   } catch (error) {
@@ -49,7 +48,7 @@ export async function searchRestaurants(req, res) {
     const skip = (Number(page) - 1) * Number(limit);
 
     const restaurants = await Restaurant.find({
-      $or: [{ name: regex }, { cuisine: regex }],
+      $or: [{ name: regex }, { cuisine: regex }, { location: regex }],
     })
       .skip(skip)
       .limit(Number(limit));
@@ -62,20 +61,90 @@ export async function searchRestaurants(req, res) {
 
 export async function createRestaurant(req, res) {
   try {
-    const { name, cuisine, location, image, deliveryTime } = req.body;
+    const { name, cuisine, location, deliveryTime, rating } = req.body;
+
+    let imageUrl = "";
+    
+    if (req.file) {
+      imageUrl = req.file.path;
+    }
+
+    if (!imageUrl) {
+      return res.status(400).json({ message: "Restaurant image is required" });
+    }
+    
+    const existingRestaurant = await Restaurant.findOne({ name });
+    if (existingRestaurant) {
+      return res.status(400).json({ message: "Restaurant already exists" });
+    }
 
     const newRestaurant = new Restaurant({
       name,
       cuisine,
       location,
-      image,
+      image: imageUrl,
       deliveryTime,
+      rating,
     });
 
     const savedRestaurant = await newRestaurant.save();
-    
-    res.status(201).json({ data: savedRestaurant });
+    return res.status(201).json({ data: savedRestaurant });
+  } catch (error) {
 
+    if (error.code === 11000) {
+      return res.status(400).json({ message: "Restaurant with this name already exists" });
+    }
+    console.error(error);
+    return res.status(500).json({ message: "Server error", error: error.message });
+  }
+}
+
+export async function editRestaurant(req, res) {
+  try {
+    const { id } = req.params;
+    const { name, cuisine, location, deliveryTime } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid restaurant id" });
+    }
+
+    const updateData = { name, cuisine, location, deliveryTime };
+
+    if (req.file) {
+      updateData.image = req.file.path;
+    }
+
+    const updatedRestaurant = await Restaurant.findByIdAndUpdate(
+      id,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedRestaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    res.status(200).json({ data: updatedRestaurant });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+}
+
+export async function deleteRestaurant(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid restaurant id" });
+    }
+
+    const deletedRestaurant = await Restaurant.findByIdAndDelete(id);
+
+    if (!deletedRestaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    res.status(200).json({ message: "Restaurant deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }

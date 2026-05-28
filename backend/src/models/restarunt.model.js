@@ -5,18 +5,33 @@ const restaurantSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+      trim: true,
+      unique: true,
     },
 
-    image: String,
+    image: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
     cuisine: String,
 
-    rating: {
-      type: Number,
-      default: 4,
+    location: {
+      type: String,
+      required: true,
+      trim: true,
     },
 
-    deliveryTime: String,
+    rating: {
+      type: String,
+      default: 0,
+    },
+
+    deliveryTime: {
+      type: Number,
+      required: true,
+    },
   },
   { timestamps: true }
 );
