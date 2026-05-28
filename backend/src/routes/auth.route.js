@@ -16,10 +16,6 @@ route.post('/login', validateLogin , login);
 
 route.get('/get-me', authenticaUser , getMe);
 
-route.post('/logout', logout);
-
-
-
-
+route.post('/logout', authenticaUser, logout);
 
 export default route

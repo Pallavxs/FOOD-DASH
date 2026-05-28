@@ -1,6 +1,7 @@
 import userModel from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import config from "../config/config.js";
+import redis from "../config/redis.js";
 
 const authTokenResponse = async (user, res, message) => {
   const token = jwt.sign(
@@ -55,7 +56,7 @@ export async function login(req, res) {
 
     if (!user) {
       return res.status(400).json({ message: "Invalid email or password" });
-    }   
+    }
 
     const isMatch = await user.comparePassword(password);
 
@@ -74,7 +75,7 @@ export async function getMe(req, res) {
     const user = await userModel.findById(req.user.id).select("-password");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
-    }   
+    }
     res.status(200).json({ user });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
@@ -82,15 +83,22 @@ export async function getMe(req, res) {
 }
 
 export async function logout(req, res) {
-    try {
-        const token = req.cookies.token;
-        if (!token) {
-            return res.status(400).json({ message: "No token provided" });
-        }
-        res.clearCookie("token");
-        res.status(200).json({ message: "Logout successful" });
-    } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
-    }
-}
+  try {
+    const token = req.cookies.token;
 
+    if (!token) {
+      return res.status(400).json({ message: "No token provided" });
+    }
+
+    res.clearCookie("token");
+
+    const tokenTtlSeconds = 60 * 60 * 24;
+    await redis.set(token, "blacklisted", { EX: tokenTtlSeconds });
+
+    return res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+}

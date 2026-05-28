@@ -10,10 +10,15 @@ if(!process.env.MONGO_URI) {
     console.error("DB_URI is not defined in environment variables");
 }
 
+if(!process.env.REDIS_URL) {
+    console.error("Redis configuration is not fully defined in environment variables");
+}
+
 
 const config = {
     MONGO_URI: process.env.MONGO_URI ,
-    JWT_SECRET: process.env.JWT_SECRET 
+    JWT_SECRET: process.env.JWT_SECRET, 
+    REDIS_URL: process.env.REDIS_URL,
 };
 
 export default config;
