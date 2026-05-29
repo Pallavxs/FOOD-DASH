@@ -1,97 +1,112 @@
-# Zomato Clone Backend
+# Zomato Clone – Full Stack Project
 
-This repository contains the backend for a Zomato-like food delivery platform. It provides a robust RESTful API built with Express.js, MongoDB, and Redis.
+## 📖 Overview
+This repository contains a **full‑stack** Zomato‑like food delivery application. The **backend** provides a robust RESTful API built with **Node.js**, **Express**, **MongoDB**, **Redis**, and **Socket.io** for real‑time updates. The **frontend** (not detailed here) consumes these APIs to deliver a seamless user experience.
 
-## 🚀 Features Implemented
+---
 
-### 1. Authentication & Security
+## 🚀 Backend Features Implemented
+### Authentication & Security
+- **User Registration** (`/auth/register`): Secure password hashing & input validation.
+- **User Login** (`/auth/login`): Issues JWTs stored in http‑only cookies.
+- **Get Current User** (`/auth/get-me`): Protected route returning the authenticated profile.
+- **Logout** (`/auth/logout`): JWT token blacklisting using **Redis (Upstash)**.
+- **Authentication Middleware** (`authenticateUser`): Verifies JWT, checks blacklist, protects private routes.
 
-* **User Registration (`/auth/register`)**: Register new users with password hashing and input validation.
-* **User Login (`/auth/login`)**: Authenticate users and issue JSON Web Tokens (JWT).
-* **Get Current User (`/auth/get-me`)**: Protected route to fetch the authenticated user's profile using JWT cookies.
-* **Secure Logout (`/auth/logout`)**: Implemented token blacklisting using Redis (Upstash). Logged-out JWTs are stored with expiration so they cannot be reused.
-* **Authentication Middleware (`authenticateUser`)**:
-  
-  * Verifies JWT tokens
-  * Checks Redis blacklist
-  * Protects private routes
+### Restaurant Management
+- **Create**, **Read**, **Update**, **Delete** restaurant profiles.
+- **Search** restaurants by name or cuisine.
+- **Pagination** support for listing.
 
-### 2. Restaurant Management
+### Menu System
+- Full CRUD for menu items tied to restaurants.
+- Ability to filter menu items by restaurant.
 
-* **Create Restaurant (`/restaurant/create`)**: Create restaurant profiles with validation.
-* **Fetch Restaurants (`/restaurant`)**: Retrieve all restaurants with pagination support.
-* **Fetch Restaurant by ID (`/restaurant/:id`)**: Retrieve details for a specific restaurant.
-* **Search Restaurants (`/restaurant/search`)**: Search restaurants by name or cuisine.
-* **Delete Restaurant (`/restaurant/:id`)**: Delete a restaurant by ID.
+### Order Processing
+- **Create Order**, **List Orders**, **Get Order by ID**.
+- **Update Order Status** (placed, preparing, out_for_delivery, delivered).
+- **Rider Location Tracking** (real‑time latitude & longitude updates).
 
-### 3. Menu System
+### File Uploads
+- Secure image upload endpoint (`/upload`) using **Multer** and **Cloudinary**.
 
-* **Create Menu Item (`/menu/create`)**: Add new menu items to a restaurant.
-* **Fetch All Menus (`/menu`)**: Retrieve all menu items with optional restaurant filtering.
-* **Fetch Menu by Restaurant (`/menu/restaurant/:restaurantId`)**: Retrieve menu items for a specific restaurant.
-* **Update Menu Item (`/menu/:id`)**: Update existing menu details.
-* **Delete Menu Item (`/menu/:id`)**: Remove a menu item.
+### Real‑time Communication
+- **Socket.io** integration for order status updates and rider location broadcasting.
 
-### 4. Order Processing
-
-* **Create Order (`/order/create`)**: Place new food orders.
-* **Fetch Orders (`/order`)**: Retrieve all placed orders.
-* **Fetch Order by ID (`/order/:id`)**: Retrieve order details.
-* **Update Order Status (`/order/:id/status`)**: Update order status (placed, preparing, out_for_delivery, delivered).
-* **Update Rider Location (`/order/:id/location`)**: Track rider's real‑time location (latitude & longitude) during delivery.
-
-### 5. File Uploads
-
-* **Image Upload (`/upload`)**:
-  
-  * Secure authenticated upload endpoint
-  * Uses Multer middleware for `multipart/form-data`
-  * Integration with Cloudinary for cloud‑based storage
-  * Returns accessible image URLs
-
-## 📌 Current Flow & Achievements
-
-- **Authentication**: Users can register, login, fetch profile, and logout securely with JWT and Redis token blacklist.
-- **Restaurant Management**: Endpoints for creating, listing, fetching by ID, and searching restaurants are functional.
-- **Menu System**: Full CRUD operations for menu items linked to restaurants.
-- **Order Processing**: Create orders, list them, get by ID, update order status, and track rider location.
-- **File Uploads**: Images are now uploaded to Cloudinary for scalable cloud storage.
-- **Environment Setup**: `.env` configured for MongoDB, Cloudinary, and Redis connections.
-- **Error Handling & Validation**: Consistent error responses and request validation across routes.
+---
 
 ## 🛠️ Technology Stack
+- **Node.js** & **Express.js** – server & routing
+- **MongoDB** & **Mongoose** – data persistence
+- **Redis (Upstash)** – JWT blacklist & session caching
+- **JWT** – authentication tokens
+- **Multer + Cloudinary** – image uploads
+- **Socket.io** – real‑time events
+- **Morgan** – request logging
+- **Dotenv** – environment variable management
 
-* Node.js
-* Express.js
-* MongoDB
-* Mongoose
-* Redis (Upstash)
-* JSON Web Tokens (JWT)
-* Multer
-* Cloudinary
-* Dotenv
+---
 
-## 📁 Directory Structure
+## 📁 Project Structure
+```
+project-root/
+├─ .env                # Environment variables (DB URI, JWT secret, etc.)
+├─ README.md           # This file
+├─ backend/            # Backend source code
+│   ├─ README.md       # Backend‑specific documentation
+│   ├─ server.js       # Entry point – DB connection, HTTP server, socket init
+│   └─ src/
+│       ├─ index.js         # Express app configuration & route registration
+│       ├─ config/          # DB, Redis, Cloudinary configuration
+│       ├─ controllers/    # Business logic for auth, restaurants, menus, orders
+│       ├─ middleware/     # Auth, role‑based access control, etc.
+│       ├─ models/         # Mongoose schemas (User, Restaurant, Menu, Order)
+│       ├─ routes/         # Route definitions – thin layer to controllers
+│       ├─ socket/         # Socket.io setup & helpers
+│       └─ validator/      # Request validation schemas
+├─ frontend/          # (If present) React/Vue/… source code
+└─ package.json       # Dependencies & npm scripts
+```
 
-* `src/controllers` → Business logic
-* `src/models` → Mongoose schemas
-* `src/routes` → API route definitions
-* `src/middleware` → Custom middleware
-* `src/validator` → Request validation logic
-* `src/config` → Configuration setup (Redis, DB, Cloudinary, etc.)
+---
 
-## ✅ Backend Concepts Covered
+## 🔄 Request Flow (Backend)
+1. **Incoming HTTP request** → `src/index.js` (Express app).
+2. **Middleware** runs (authentication, role checks, validation).
+3. Request reaches the appropriate **router** (`src/routes/*.route.js`).
+4. Router forwards to the corresponding **controller** (`src/controllers/*.controller.js`).
+5. Controller interacts with **Mongoose models** to read/write MongoDB.
+6. Controller may emit **Socket.io events** for real‑time updates.
+7. A JSON response is sent back to the client.
 
-* REST APIs
-* Authentication & Authorization
-* JWT Cookies
-* Redis Token Blacklisting
-* Protected Routes
-* MongoDB Relationships
-* Pagination
-* Search APIs
-* Cloud File Upload Handling (Cloudinary)
-* Middleware Architecture
-* MVC Pattern
-* Input Validation
-* Error Handling
+---
+
+## ▶️ How to Run the Backend Locally
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Create a .env file (copy from .env.example) and set:
+#    - MONGODB_URI
+#    - JWT_SECRET
+#    - REDIS_URL (Upstash)
+#    - CLOUDINARY_* variables
+
+# 3. Start the development server
+npm run dev   # runs server.js with nodemon (if configured) or `node server.js`
+```
+The API will be reachable at `http://localhost:3000`.
+
+---
+
+## ✅ What’s Done So Far
+- Clean **router‑controller‑service** architecture.
+- Role‑based access control (`role.middleware.js`).
+- Comprehensive request validation.
+- Real‑time order status & rider tracking using **Socket.io**.
+- Centralised error handling & request logging (`morgan`).
+- Structured project layout for easy feature expansion.
+
+---
+
+*Feel free to expand this README as the project evolves.*

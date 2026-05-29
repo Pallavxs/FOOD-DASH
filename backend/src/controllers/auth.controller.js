@@ -7,6 +7,7 @@ const authTokenResponse = async (user, res, message) => {
   const token = jwt.sign(
     {
       id: user._id,
+      role: user.role,
     },
     config.JWT_SECRET,
     { expiresIn: "1 day" },

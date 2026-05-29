@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import Restaurant from "../models/restarunt.model.js";
 import Menu from "../models/menu.model.js";
 
 export const getMenu = async (req, res) => {
@@ -39,18 +39,25 @@ export const createMenu = async (req, res) => {
     const { restaurant, name, description, price } = req.body;
 
     let imageUrl = req.file ? req.file.path : (req.body.image || "");
-    
+
     if (!imageUrl) {
       return res.status(400).json({ message: "Restaurant image is required" });
     }
-
 
     if (!restaurant || !name || !description || !price) {
       return res.status(400).json({
         message: "All fields are required",
       });
     }
-    
+
+    const restaurantExists = await Restaurant.findById(restaurant);
+
+    if (!restaurantExists) {
+      return res.status(404).json({
+        message: "Restaurant not found",
+      });
+    }
+
 
     const newMenu = new Menu({
       restaurant,

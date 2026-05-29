@@ -6,7 +6,10 @@ export async function getRestaurants(req, res) {
     const { page = 1, limit = 20 } = req.query;
     const skip = (Number(page) - 1) * Number(limit);
 
-    const restaurants = await Restaurant.find().skip(skip).limit(Number(limit));
+    const restaurants = await Restaurant.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number(limit));
 
     res.status(200).json({ data: restaurants });
   } catch (error) {
@@ -21,9 +24,11 @@ export async function getRestaurantById(req, res) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid restaurant id" });
     }
-
+    
     const restaurant = await Restaurant.findById(id);
-
+    
+    console.log("Fetching restaurant with id:", id);
+    
     if (!restaurant) {
       return res.status(404).json({ message: "Restaurant not found" });
     }
@@ -64,7 +69,7 @@ export async function createRestaurant(req, res) {
     const { name, cuisine, location, deliveryTime, rating } = req.body;
 
     let imageUrl = "";
-    
+
     if (req.file) {
       imageUrl = req.file.path;
     }
@@ -72,13 +77,14 @@ export async function createRestaurant(req, res) {
     if (!imageUrl) {
       return res.status(400).json({ message: "Restaurant image is required" });
     }
-    
+
     const existingRestaurant = await Restaurant.findOne({ name });
     if (existingRestaurant) {
       return res.status(400).json({ message: "Restaurant already exists" });
     }
 
     const newRestaurant = new Restaurant({
+      owner: req.user.id,
       name,
       cuisine,
       location,
@@ -88,6 +94,7 @@ export async function createRestaurant(req, res) {
     });
 
     const savedRestaurant = await newRestaurant.save();
+
     return res.status(201).json({ data: savedRestaurant });
   } catch (error) {
 
@@ -102,31 +109,72 @@ export async function createRestaurant(req, res) {
 export async function editRestaurant(req, res) {
   try {
     const { id } = req.params;
-    const { name, cuisine, location, deliveryTime } = req.body;
+
+    const {
+      name,
+      cuisine,
+      location,
+      deliveryTime,
+    } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid restaurant id" });
+      return res.status(400).json({
+        message: "Invalid restaurant id",
+      });
     }
 
-    const updateData = { name, cuisine, location, deliveryTime };
+    const restaurant = await Restaurant.findById(id);
+
+    if (!restaurant) {
+      return res.status(404).json({
+        message: "Restaurant not found",
+      });
+    }
+
+    if (
+      restaurant.owner.toString() !== req.user.id &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(403).json({
+        message: "Access denied",
+      });
+    }
+
+    const updateData = {};
+
+    if (name) updateData.name = name;
+
+    if (cuisine) updateData.cuisine = cuisine;
+
+    if (location) updateData.location = location;
+
+    if (deliveryTime) {
+      updateData.deliveryTime = deliveryTime;
+    }
 
     if (req.file) {
       updateData.image = req.file.path;
     }
 
-    const updatedRestaurant = await Restaurant.findByIdAndUpdate(
-      id,
-      { $set: updateData },
-      { new: true, runValidators: true }
-    );
+    const updatedRestaurant =
+      await Restaurant.findByIdAndUpdate(
+        id,
+        { $set: updateData },
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
 
-    if (!updatedRestaurant) {
-      return res.status(404).json({ message: "Restaurant not found" });
-    }
+    res.status(200).json({
+      data: updatedRestaurant,
+    });
 
-    res.status(200).json({ data: updatedRestaurant });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
   }
 }
 
@@ -135,17 +183,38 @@ export async function deleteRestaurant(req, res) {
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid restaurant id" });
+      return res.status(400).json({
+        message: "Invalid restaurant id",
+      });
     }
 
-    const deletedRestaurant = await Restaurant.findByIdAndDelete(id);
+    const restaurant = await Restaurant.findById(id);
 
-    if (!deletedRestaurant) {
-      return res.status(404).json({ message: "Restaurant not found" });
+    if (!restaurant) {
+      return res.status(404).json({
+        message: "Restaurant not found",
+      });
     }
 
-    res.status(200).json({ message: "Restaurant deleted successfully" });
+    if (
+      restaurant.owner.toString() !== req.user.id &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(403).json({
+        message: "Access denied",
+      });
+    }
+
+    await Restaurant.findByIdAndDelete(id);
+
+    res.status(200).json({
+      message: "Restaurant deleted successfully",
+    });
+
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
   }
 }
