@@ -1,80 +1,91 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, Dimensions, Pressable, Alert, SafeAreaView } from 'react-native';
-import { Link, useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
-import AuthFormCard from '../../components/AuthFormCard';
-import CustomInput from '../../components/CustomInput';
-import PrimaryButton from '../../components/PrimaryButton';
-import { colors, dimensions } from '../../styles/authStyles';
-import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../../redux/actions/authActions';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  ImageBackground,
+  StyleSheet,
+  Dimensions,
+  Pressable,
+} from "react-native";
 
-/**
- * Login screen following the premium Zomato aesthetic.
- */
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Link, useRouter } from "expo-router";
+import { useDispatch, useSelector } from "react-redux";
+
+
+import AuthFormCard from "../../components/AuthFormCard";
+import CustomInput from "../../components/CustomInput";
+import PrimaryButton from "../../components/PrimaryButton";
+import { login } from "../../redux/actions/authActions";
+
+const { height } = Dimensions.get("window");
+
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [validationError, setValidationError] = useState(null);
-  const { loading, error: apiError, user } = useSelector(state => state.auth);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [validationError, setValidationError] = useState("");
+
+  const dispatch = useDispatch();
   const router = useRouter();
+
+  const { loading, error, user } = useSelector(
+    (state) => state.auth
+  );
 
   useEffect(() => {
     if (user) {
-      router.replace('/home');
+      router.replace("/tabs/home");
     }
   }, [user]);
 
-  const dispatch = useDispatch();
-
   const handleLogin = () => {
     if (!email || !password) {
-      setValidationError('Please fill in both fields.');
+      setValidationError("Please fill all fields");
       return;
     }
-    // Clear previous errors
-    setValidationError(null);
-    // Dispatch login thunk
-    dispatch(login({ email, password }));
+
+    setValidationError("");
+
+    dispatch(
+      login({
+        email,
+        password,
+      })
+    );
   };
-
-  // Google login is omitted per design specifications
-
-  const { height: screenHeight } = Dimensions.get('window');
-  const heroHeight = screenHeight * dimensions.heroHeightRatio;
+  
 
   return (
-    <View style={styles.container}>
-      {/* Hero Banner */}
-        <LinearGradient
-          colors={[colors.primaryRed, '#ff7f7f']}
-          style={[styles.heroWrapper, { height: heroHeight }]}
-        >
-          <Image
-            source={require('../../../assets/auth/login-banner.png')}
-            style={styles.heroImage}
-            resizeMode="cover"
-          />
-          <View style={styles.overlay} />
-          <View style={styles.heroTextContainer}>
-          <Text style={styles.welcome}>Welcome Back</Text>
-          <Text style={styles.subtitle}>Order food from your favorite restaurants.</Text>
-          </View>
-        </LinearGradient>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.background}>
+        <View style={styles.cardContainer}>
+          <AuthFormCard>
 
-      {/* Form Card */}
-      <View style={styles.cardWrapper}>
-        <AuthFormCard>
-            {(validationError || apiError) && (
-              <Text style={styles.errorText}>{validationError || apiError}</Text>
+            <Text style={styles.logo}>
+              FoodDash
+            </Text>
+
+            <Text style={styles.title}>
+              Welcome back!
+            </Text>
+
+            <Text style={styles.subtitle}>
+              Sign in to continue your food journey
+            </Text>
+
+            {(validationError || error) && (
+              <Text style={styles.error}>
+                {validationError || error}
+              </Text>
             )}
+
             <CustomInput
-              placeholder="Email"
+              placeholder="Email Address"
               value={email}
               onChangeText={setEmail}
               icon="mail"
-              secure={false}
             />
+
             <CustomInput
               placeholder="Password"
               value={password}
@@ -82,78 +93,109 @@ export default function LoginScreen() {
               icon="lock"
               secure={true}
             />
-          <Pressable onPress={() => { /* navigate to ForgotPassword later */ }}>
-            <Text style={styles.forgot}>Forgot Password?</Text>
-          </Pressable>
-          <PrimaryButton title="Login" onPress={handleLogin} loading={loading} disabled={loading} />
-          <View style={styles.bottomLinkContainer}>
-            <Text style={styles.bottomLinkText}>Don't have an account? </Text>
-            <Link href="/auth/register" style={styles.bottomLink}>Sign Up</Link>
-          </View>
-        </AuthFormCard>
+
+            {/* <Pressable>
+              <Text style={styles.forgot}>
+                Forgot Password?
+              </Text>
+            </Pressable> */}
+
+            <PrimaryButton
+              title="Log In"
+              loading={loading}
+              disabled={loading}
+              onPress={handleLogin}
+            />
+
+            <View style={styles.bottom}>
+              <Text style={styles.bottomText}>
+                Don't have an account?
+              </Text>
+
+              <Link
+                href="auth/register"
+                style={styles.signup}
+              >
+                Register
+              </Link>
+            </View>
+
+          </AuthFormCard>
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.backgroundWhite,
   },
-  heroWrapper: {
-    position: 'relative',
-    width: '100%',
+
+  background: {
+    flex: 1,
+    justifyContent: "center",
+    paddingHorizontal: 20,
+    backgroundColor: "#6F866E",
   },
-  heroImage: {
-    width: '100%',
-    height: '100%',
+
+  cardContainer: {
+    justifyContent: "center",
   },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+
+  logo: {
+    textAlign: "center",
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#C8102E",
+    marginBottom: 30,
   },
-  heroTextContainer: {
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-    right: 20,
+
+  title: {
+    textAlign: "center",
+    fontSize: 42,
+    fontWeight: "800",
+    color: "#111",
+    marginBottom: 12,
   },
-  cardWrapper: {
-    position: 'relative',
-    top: -40,
-    // pulls the card up to overlap hero
-  },
-  welcome: {
-    color: '#FFF',
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
+
   subtitle: {
-    color: '#FFF',
-    fontSize: 14,
+    textAlign: "center",
+    fontSize: 16,
+    color: "#6B4F4F",
+    marginBottom: 35,
   },
-  errorText: {
-    color: 'red',
-    textAlign: 'center',
-    marginBottom: 8,
+
+  error: {
+    color: "#E23744",
+    textAlign: "center",
+    marginBottom: 12,
+    fontWeight: "600",
   },
+
   forgot: {
-    color: colors.primaryRed,
-    textAlign: 'right',
-    marginVertical: 8,
+    color: "#C8102E",
+    textAlign: "right",
+    fontWeight: "700",
+    marginTop: 10,
+    marginBottom: 20,
   },
-  bottomLinkContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 12,
+
+  bottom: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 25,
   },
-  bottomLinkText: {
-    color: colors.textSecondary,
+
+  bottomText: {
+    color: "#555",
+    fontSize: 15,
   },
-  bottomLink: {
-    color: colors.primaryRed,
-    fontWeight: '600',
+
+  signup: {
+    marginLeft: 6,
+    color: "#C8102E",
+    fontWeight: "700",
+    fontSize: 15,
   },
 });
