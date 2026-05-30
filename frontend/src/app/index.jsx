@@ -1,23 +1,5 @@
-import { useEffect } from "react";
-import { View, Text } from "react-native";
-import { socket } from "../socket/socket";
+import { Redirect } from "expo-router";
 
-export default function HomeScreen() {
-  useEffect(() => {
-    socket.connect();
-
-    socket.on("connect", () => {
-      console.log("Connected:", socket.id);
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
-  return (
-    <View>
-      <Text>Socket Test</Text>
-    </View>
-  );
+export default function Index() {
+  return <Redirect href="/auth/login" />
 }

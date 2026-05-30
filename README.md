@@ -109,4 +109,24 @@ The API will be reachable at `http://localhost:3000`.
 
 ---
 
-*Feel free to expand this README as the project evolves.*
+Progress
+
+Authentication Backend      100%
+Restaurant Backend          100%
+Menu Backend                100%
+Order Backend               90%
+Socket Backend              10%
+
+Frontend Setup              50%
+Authentication Frontend     30%
+Restaurant UI               0%
+Search & Filter             0%
+Cart                         0%
+Orders UI                   0%
+Socket.IO Realtime          0%
+Map Tracking                0%
+Optimistic UI               0%
+
+Backend: 80-85% complete
+Frontend: 15-20% complete
+Whole Assignment: 45-50% complete
