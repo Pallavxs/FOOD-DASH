@@ -41,25 +41,25 @@ export async function getRestaurantById(req, res) {
 
 export async function searchRestaurants(req, res) {
   try {
-    const { q, page = 1, limit = 20 } = req.query;
-
-    if (!q) {
-      return res
-        .status(400)
-        .json({ message: "Query parameter `q` is required" });
+    // Accept query as `query` or `keyword` (fallback to `q` for legacy)
+    const { query, keyword, q, page = 1, limit = 20 } = req.query;
+    const searchTerm = query || keyword || q;
+    console.log('Search Query:', req.query);
+    if (!searchTerm) {
+      return res.status(400).json({ message: "Search term is required" });
     }
-
-    const regex = new RegExp(q, "i");
+    const regex = new RegExp(searchTerm, "i");
     const skip = (Number(page) - 1) * Number(limit);
 
+    // Search only name and cuisine as per spec
     const restaurants = await Restaurant.find({
-      $or: [{ name: regex }, { cuisine: regex }, { location: regex }],
+      $or: [{ name: regex }, { cuisine: regex }],
     })
       .skip(skip)
       .limit(Number(limit));
-
     res.status(200).json({ data: restaurants });
   } catch (error) {
+    console.error('Search error:', error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 }

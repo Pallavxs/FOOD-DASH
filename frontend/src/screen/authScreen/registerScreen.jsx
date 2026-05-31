@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Dimensions, Alert, StyleSheet, ImageBackground } from "react-native";
+import { View, Text, Dimensions, Alert, StyleSheet, ImageBackground , Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,7 +8,6 @@ import AuthFormCard from "../../components/AuthFormCard";
 import CustomInput from "../../components/CustomInput";
 import PrimaryButton from "../../components/PrimaryButton";
 import { colors, dimensions } from "../../styles/authStyles";
-import { Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function RegisterScreen() {
@@ -41,7 +40,7 @@ export default function RegisterScreen() {
     try {
       await dispatch(register({ name, email, password, role })).unwrap();
     } catch (e) {
-      console.log("Registration error", e);
+
     }
   };
 

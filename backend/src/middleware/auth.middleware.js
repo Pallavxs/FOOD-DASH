@@ -18,6 +18,8 @@ export async function authenticaUser(req, res, next) {
     try {
         const decoded = jwt.verify(token, config.JWT_SECRET);
         req.user = decoded;
+      req.user._id = decoded.id;
+        console.log('REQ USER:', req.user);
         return next();
     } catch (error) {
         res.status(401).json({ message: "Invalid token" });

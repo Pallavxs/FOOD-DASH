@@ -11,12 +11,11 @@ import {
   ScrollView,
   Dimensions,
 } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams , router } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { addItem } from '../../redux/slices/cartSlice';
 import { getMenuByRestaurantId } from '../../api/services/menuService';
 import { getRestaurantById } from '../../api/services/restaurantService';
-import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -212,8 +211,7 @@ export default function RestaurantDetails() {
 );
 }
 
-/* --------------------------------------------------------------- */
-/* --------------------------- STYLES ----------------------------- */
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -15,8 +15,9 @@ export const getRestaurantById = async (id) => {
 };
 
 export const searchRestaurants = async (query) => {
+
   const response = await api.get('/restaurants/search', {
-    params: { q: query },
+    params: { query: query },
   });
   return response.data?.data ?? [];
 };

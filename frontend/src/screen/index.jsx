@@ -1,23 +1,14 @@
 import { useEffect } from "react";
 import { View, Text } from "react-native";
-import { socket } from "../socket/socket";
 
 export default function HomeScreen() {
   useEffect(() => {
-    socket.connect();
-
-    socket.on("connect", () => {
-      console.log("Connected:", socket.id);
-    });
-
-    return () => {
-      socket.disconnect();
-    };
+    // Socket test removed for production cleanup
   }, []);
 
   return (
     <View>
-      <Text>Socket Test</Text>
+      <Text>Screen removed</Text>
     </View>
   );
 }

@@ -1,111 +1,136 @@
-# FOOD DASH – Full Stack Project
+# FOOD DASH
 
-## 📖 Overview
-This repository contains a **full‑stack** Zomato‑like food delivery application. The **backend** provides a robust RESTful API built with **Node.js**, **Express**, **MongoDB**, **Redis**, and **Socket.io** for real‑time updates. The **frontend** (not detailed here) consumes these APIs to deliver a seamless user experience.
+## Project Overview
 
----
+**FOOD DASH** is a mobile‑first food‑delivery application built with **React Native (Expo)** for the frontend and a **Node.js/Express** backend. It showcases a complete end‑to‑end flow: authentication, restaurant browsing, search, cart management, checkout, real‑time order tracking via **Socket.IO**, and profile management. The codebase is production‑ready and interview‑friendly.
 
-## 🚀 Backend Features Implemented
-### Authentication & Security
-- **User Registration** (`/auth/register`): Secure password hashing & input validation.
-- **User Login** (`/auth/login`): Issues JWTs stored in http‑only cookies.
-- **Get Current User** (`/auth/get-me`): Protected route returning the authenticated profile.
-- **Logout** (`/auth/logout`): JWT token blacklisting using **Redis (Upstash)**.
-- **Authentication Middleware** (`authenticateUser`): Verifies JWT, checks blacklist, protects private routes.
+## Features
 
-### Restaurant Management
-- **Create**, **Read**, **Update**, **Delete** restaurant profiles.
-- **Search** restaurants by name or cuisine.
-- **Pagination** support for listing.
+- User registration & login with JWT authentication
+- Browse restaurants and view detailed menus
+- Debounced search with empty‑state and no‑results handling
+- Cart with quantity management, discounts, delivery fee & taxes
+- Checkout flow that creates an order on the backend
+- Orders list and detailed order tracking page
+- Real‑time order status updates via a single Socket.IO connection
+- Clean UI built with **React Native StyleSheet** (no external UI libs)
 
-### Menu System
-- Full CRUD for menu items tied to restaurants.
-- Ability to filter menu items by restaurant.
+## Tech Stack
 
-### Order Processing
-- **Create Order**, **List Orders**, **Get Order by ID**.
-- **Update Order Status** (placed, preparing, out_for_delivery, delivered).
-- **Rider Location Tracking** (real‑time latitude & longitude updates).
+| Layer      | Technology |
+|------------|------------|
+| Frontend   | React Native (Expo), Expo Router, Redux Toolkit, Axios |
+| Backend    | Node.js, Express, MongoDB (Mongoose), Socket.IO |
+| Auth       | JWT, bcrypt |
+| Styling    | React Native StyleSheet |
+| Testing    | Manual UI walkthrough (no automated tests) |
 
-### File Uploads
-- Secure image upload endpoint (`/upload`) using **Multer** and **Cloudinary**.
+## Installation Steps
 
-### Real‑time Communication
-- **Socket.io** integration for order status updates and rider location broadcasting.
-
----
-
-## 🛠️ Technology Stack
-- **Node.js** & **Express.js** – server & routing
-- **MongoDB** & **Mongoose** – data persistence
-- **Redis (Upstash)** – JWT blacklist & session caching
-- **JWT** – authentication tokens
-- **Multer + Cloudinary** – image uploads
-- **Socket.io** – real‑time events
-- **Morgan** – request logging
-- **Dotenv** – environment variable management
-
----
-
-## 📁 Project Structure
-```
-project-root/
-├─ .env                # Environment variables (DB URI, JWT secret, etc.)
-├─ README.md           # This file
-├─ backend/            # Backend source code
-│   ├─ README.md       # Backend‑specific documentation
-│   ├─ server.js       # Entry point – DB connection, HTTP server, socket init
-│   └─ src/
-│       ├─ index.js         # Express app configuration & route registration
-│       ├─ config/          # DB, Redis, Cloudinary configuration
-│       ├─ controllers/    # Business logic for auth, restaurants, menus, orders
-│       ├─ middleware/     # Auth, role‑based access control, etc.
-│       ├─ models/         # Mongoose schemas (User, Restaurant, Menu, Order)
-│       ├─ routes/         # Route definitions – thin layer to controllers
-│       ├─ socket/         # Socket.io setup & helpers
-│       └─ validator/      # Request validation schemas
-├─ frontend/          # (If present) React/Vue/… source code
-└─ package.json       # Dependencies & npm scripts
-```
-
----
-
-## 🔄 Request Flow (Backend)
-1. **Incoming HTTP request** → `src/index.js` (Express app).
-2. **Middleware** runs (authentication, role checks, validation).
-3. Request reaches the appropriate **router** (`src/routes/*.route.js`).
-4. Router forwards to the corresponding **controller** (`src/controllers/*.controller.js`).
-5. Controller interacts with **Mongoose models** to read/write MongoDB.
-6. Controller may emit **Socket.io events** for real‑time updates.
-7. A JSON response is sent back to the client.
-
----
-
-## ▶️ How to Run the Backend Locally
 ```bash
-# 1. Install dependencies
+# 1. Clone the repository
+git clone <repo-url>
+cd "c:/Intern Project"
+
+# 2. Install backend dependencies
+cd backend
 npm install
 
-# 2. Create a .env file (copy from .env.example) and set:
-#    - MONGODB_URI
-#    - JWT_SECRET
-#    - REDIS_URL (Upstash)
-#    - CLOUDINARY_* variables
-
-# 3. Start the development server
-npm run dev   # runs server.js with nodemon (if configured) or `node server.js`
+# 3. Install frontend dependencies
+cd ../frontend
+npm install
 ```
-The API will be reachable at `http://localhost:3000`.
+
+### Environment Variables
+Create a **.env** file in the `backend/` folder with the following keys:
+
+```
+MONGO_URI=<MongoDB connection string>
+JWT_SECRET=<Random secret string>
+PORT=3000
+CLIENT_URL=http://localhost:19006   # Expo dev URL
+```
+
+The frontend reads the API base URL from `frontend/src/api/api.js`.
+
+## Running the Application
+
+```bash
+# Backend (from backend folder)
+npm run dev   # starts Express on PORT (default 3000)
+
+# Frontend (from frontend folder)
+npm run dev   # starts Expo Metro bundler
+```
+
+Open the Expo client on a device or simulator and scan the QR code generated by `npm run dev`.
+
+## Folder Structure
+
+```
+c:/Intern Project/
+├─ backend/                # Express API & Socket.IO server
+│   ├─ src/
+│   │   ├─ controllers/   # Business logic (auth, restaurants, orders)
+│   │   ├─ models/        # Mongoose schemas
+│   │   ├─ routes/        # Express routers
+│   │   └─ middleware/    # Auth, error handling, logging
+│   └─ .env               # Environment variables
+├─ frontend/               # Expo React‑Native app
+│   ├─ src/
+│   │   ├─ api/                # Axios instance & service files
+│   │   ├─ components/         # Re‑usable UI components
+│   │   ├─ redux/              # Slices, store, actions
+│   │   ├─ screen/             # All screens (auth, home, cart, etc.)
+│   │   └─ services/           # socketService.js (single socket instance)
+│   └─ app.json, app.config.js
+├─ README.md               # <‑‑ this file
+├─ PROJECT_EXPLANATION.md  # Architecture overview
+├─ CHANGELOG.md            # Cleanup summary
+└─ AUDIT_REPORT.md         # Final audit report
+```
+
+## API Endpoints (Backend)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/api/auth/register` | Register a new user |
+| `POST` | `/api/auth/login` | Authenticate and receive JWT |
+| `GET`  | `/api/restaurants` | List all restaurants |
+| `GET`  | `/api/restaurants/search?query=…` | Search restaurants by name or cuisine |
+| `POST` | `/api/orders` | Create a new order |
+| `GET`  | `/api/orders/:id` | Get order details |
+| `GET`  | `/api/orders/user/:userId` | List orders for a specific user |
+
+## Socket.IO Flow
+
+1. After a successful login the client calls `initSocket(userId)` (see `frontend/src/services/socketService.js`).
+2. The socket connects to the backend (`http://<HOST>:3000`).
+3. The server joins the socket to a room named after the user ID.
+4. When an order status changes, the server emits `order-status-updated` with the new status.
+5. The client registers a single listener via `onOrderStatusUpdated(callback)`. The listener is cleaned up with `socket.off` before re‑adding to avoid duplicate handlers.
+6. On **Logout**, the socket is explicitly disconnected.
+
+## Application Flow (User Journey)
+
+1. **Login** – User provides credentials, receives a JWT, and the socket connection is initialised.
+2. **Home** – Shows a banner, popular restaurants, and a fast‑delivery carousel.
+3. **Search** – Debounced API call returns matching restaurants; handles empty and no‑result states.
+4. **Restaurant Details** – Displays menu items; user can add items to the cart.
+5. **Cart** – Review selected items, apply promo codes, see subtotal, delivery fee, taxes, and total.
+6. **Checkout** – Choose payment method, place the order (`POST /orders`). On success, navigate to **Order Success**.
+7. **Orders** – Lists all past orders for the logged‑in user.
+8. **Track Order** – Shows order details and a live status badge that updates via Socket.IO.
+9. **Profile** – Allows viewing/editing user info and logging out (socket disconnect).
+
+## Future Improvements
+
+- Add unit & integration tests (Jest, React Native Testing Library).
+- Introduce a theming system or design tokens for easier UI scaling.
+- Implement push‑notification support for order status updates.
+- Optimize image handling and caching for low‑bandwidth devices.
+- Refactor duplicated style keys into a shared style module if the project grows.
 
 ---
 
-## ✅ What’s Done So Far
-- Clean **router‑controller‑service** architecture.
-- Role‑based access control (`role.middleware.js`).
-- Comprehensive request validation.
-- Real‑time order status & rider tracking using **Socket.io**.
-- Centralised error handling & request logging (`morgan`).
-- Structured project layout for easy feature expansion.
-
----
-
+*Prepared for interview showcase – concise, professional, and ready to demonstrate a production‑ready React Native food‑delivery app.*

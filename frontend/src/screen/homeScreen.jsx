@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ScrollView, ImageBackground, TextInput, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'expo-router';
 import { fetchRestaurants } from '../redux/actions/restaurantActions';
+import { searchRestaurants } from '../api/services/restaurantService';
 import RestaurantCard from '../components/RestaurantCard';
 import { AntDesign, MaterialIcons, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors, shadows } from '../styles/authStyles';
@@ -13,8 +14,29 @@ import FastCard from '../components/FastCard';
 const BANNER_IMAGE = 'https://images.unsplash.com/photo-1546069901-eacef0df6022?auto=format&fit=crop&w=800&q=80'; // placeholder hero image
 
 export default function HomeScreen() {
+  // Search state
+  const [search, setSearch] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+
   const dispatch = useDispatch();
   const router = useRouter();
+
+  // Search handler
+  const handleSearch = async () => {
+
+    setSearchLoading(true);
+    try {
+      const results = await searchRestaurants(search.trim());
+
+      setSearchResults(results);
+    } catch (err) {
+      console.error('Search error:', err);
+      setSearchResults([]);
+    } finally {
+      setSearchLoading(false);
+    }
+  };
 
   const restaurants = useSelector(state => {
     const r = state.restaurant?.restaurants;
@@ -23,10 +45,29 @@ export default function HomeScreen() {
   const loading = useSelector(state => state.restaurant?.loading ?? false);
   const error = useSelector(state => state.restaurant?.error ?? null);
 
-  // Load restaurants once on mount
+  // Load restaurants on mount
   useEffect(() => {
+
     dispatch(fetchRestaurants());
   }, [dispatch]);
+
+  // Log fetched restaurants
+  useEffect(() => {
+
+  }, [restaurants]);
+
+
+  // Debounced search effect
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (search.trim().length >= 2) {
+        handleSearch();
+      }
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [search]);
+
+
 
   const handlePress = (id) => {
     if (router && typeof router.push === 'function') {
@@ -64,10 +105,13 @@ export default function HomeScreen() {
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
+        <AntDesign name="search" size={20} color="#888" style={styles.searchIcon} />
         <TextInput
-          placeholder="Search for burgers, sushi, or pizza"
+          placeholder="Search restaurants, cuisines..."
           placeholderTextColor="#888"
           style={styles.searchInput}
+          value={search}
+          onChangeText={setSearch}
         />
         <TouchableOpacity style={styles.filterBtn}>
           <MaterialIcons name="filter-list" size={24} color="#fff" />
@@ -77,54 +121,71 @@ export default function HomeScreen() {
 
 
 
-      {/* Main Content */}
-      <ScrollView style={styles.contentScroll} showsVerticalScrollIndicator={false}>
+      {/* Conditional Rendering based on search */}
+      {search.trim().length >= 2 ? (
+        <View style={{ flex: 1, padding: 16 }}>
+          {searchLoading ? (
+            <ActivityIndicator size="large" color={colors.primaryRed} style={styles.loader} />
+          ) : searchResults.length > 0 ? (
+            <FlatList
+              data={searchResults}
+              renderItem={renderRestaurant}
+              keyExtractor={(item) => item._id?.toString()}
+              showsVerticalScrollIndicator={false}
+            />
+          ) : (
+            <Text style={styles.emptyText}>No restaurants found.</Text>
+          )}
+        </View>
+      ) : (
+        <ScrollView style={styles.contentScroll} showsVerticalScrollIndicator={false}>
 
-        <ImageBackground source={{ uri: BANNER_IMAGE }} style={styles.banner} imageStyle={styles.bannerImage}>
-          <View style={styles.bannerOverlay} />
-          <View style={styles.bannerContent}>
-            <View style={styles.bannerBadge}>
-              <Text style={styles.bannerBadgeText}>LIMITED TIME OFFER</Text>
+          <ImageBackground source={{ uri: BANNER_IMAGE }} style={styles.banner} imageStyle={styles.bannerImage}>
+            <View style={styles.bannerOverlay} />
+            <View style={styles.bannerContent}>
+              <View style={styles.bannerBadge}>
+                <Text style={styles.bannerBadgeText}>LIMITED TIME OFFER</Text>
+              </View>
+              <Text style={styles.bannerTitle}>Delicious meals delivered fast</Text>
+              <Text style={styles.bannerSubtitle}>30% OFF • Use code ZOMATO30</Text>
+              <TouchableOpacity style={styles.bannerBtn} onPress={() => { /* TODO: handle order */ }}>
+                <Text style={styles.bannerBtnText}>Order Now</Text>
+              </TouchableOpacity>
             </View>
-            <Text style={styles.bannerTitle}>Delicious meals delivered fast</Text>
-            <Text style={styles.bannerSubtitle}>30% OFF • Use code ZOMATO30</Text>
-            <TouchableOpacity style={styles.bannerBtn} onPress={() => { /* TODO: handle order */ }}>
-              <Text style={styles.bannerBtnText}>Order Now</Text>
-            </TouchableOpacity>
+          </ImageBackground>
+
+          {/* Popular Restaurants */}
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Popular Restaurants</Text>
           </View>
-        </ImageBackground>
+          {loading && <ActivityIndicator size="large" color={colors.primaryRed} style={styles.loader} />}
+          {error && <Text style={styles.errorText}>Failed to load restaurants.</Text>}
+          {!loading && !error && restaurants.length === 0 && (
+            <Text style={styles.emptyText}>No restaurants found.</Text>
+          )}
+          {!loading && !error && restaurants.length > 0 && (
+            <FlatList
+              data={restaurants}
+              renderItem={renderRestaurant}
+              keyExtractor={(item) => item._id?.toString()}
+              scrollEnabled={false}
+            />
+          )}
 
-        {/* Popular Restaurants */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Popular Restaurants</Text>
-        </View>
-        {loading && <ActivityIndicator size="large" color={colors.primaryRed} style={styles.loader} />}
-        {error && <Text style={styles.errorText}>Failed to load restaurants.</Text>}
-        {!loading && !error && restaurants.length === 0 && (
-          <Text style={styles.emptyText}>No restaurants found.</Text>
-        )}
-        {!loading && !error && restaurants.length > 0 && (
+          {/* Fastest Delivery */}
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Fastest Delivery</Text>
+          </View>
           <FlatList
-            data={restaurants}
-            renderItem={renderRestaurant}
+            data={restaurants.slice().sort((a, b) => a.deliveryTime - b.deliveryTime).slice(0, 10)}
+            renderItem={renderFastest}
             keyExtractor={(item) => item._id?.toString()}
-            scrollEnabled={false}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.fastList}
           />
-        )}
-
-        {/* Fastest Delivery */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Fastest Delivery</Text>
-        </View>
-        <FlatList
-          data={restaurants.slice().sort((a, b) => a.deliveryTime - b.deliveryTime).slice(0, 10)}
-          renderItem={renderFastest}
-          keyExtractor={(item) => item._id?.toString()}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.fastList}
-        />
-      </ScrollView>
+        </ScrollView>
+      )}
 
       {/* Bottom Navigation */}
       <View style={styles.bottomNav}>
@@ -166,7 +227,7 @@ export default function HomeScreen() {
 
         <TouchableOpacity
           style={styles.navItem}
-          onPress={() => router.push("/account")}
+          onPress={() => router.push("/profile")}
         >
           <FontAwesome
             name="user"
@@ -213,6 +274,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginHorizontal: 16,
     marginBottom: 12,
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+  },
+  searchIcon: {
+    marginRight: 8,
   },
   searchInput: {
     flex: 1,

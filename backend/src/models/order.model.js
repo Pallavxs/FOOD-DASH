@@ -7,11 +7,13 @@ const OrderSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+
     restaurant: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Restaurant",
       required: true,
     },
+
     items: [
       {
         menuItem: {
@@ -26,22 +28,37 @@ const OrderSchema = new mongoose.Schema(
         },
       },
     ],
+
     totalAmount: {
       type: Number,
       required: true,
     },
+
+    paymentMethod: {
+      type: String,
+      enum: ["COD", "UPI", "Card"],
+      default: "COD",
+    },
+
+    deliveryAddress: {
+      type: String,
+      default: "",
+    },
+
     status: {
       type: String,
-      enum: ["placed", "preparing", "out_for_delivery", "delivered"],
+      enum: [
+        "placed",
+        "preparing",
+        "out_for_delivery",
+        "delivered",
+      ],
       default: "placed",
     },
+
     riderLocation: {
-      lat: {
-        type: Number,
-      },
-      lng: {
-        type: Number,
-      },
+      lat: Number,
+      lng: Number,
     },
   },
   { timestamps: true }
@@ -50,3 +67,5 @@ const OrderSchema = new mongoose.Schema(
 const Order = mongoose.model("Order", OrderSchema);
 
 export default Order;
+
+

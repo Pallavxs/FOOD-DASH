@@ -1,6 +1,6 @@
 import Order from "../models/order.model.js";
 import Menu from "../models/menu.model.js";
-
+import { emitOrderStatus } from "../socket/socket.js";
 export const createOrder = async (req, res) => {
   try {
     const { restaurant, items, riderLocation } = req.body;
@@ -49,10 +49,10 @@ export const createOrder = async (req, res) => {
 
 export const getOrders = async (req, res) => {
   try {
-    const orders = await Order.find()
-      .populate("user", "name email")
-      .populate("restaurant", "name")
-      .populate("items.menuItem", "name price")
+    const orders = await Order.find({ user: req.user.id })
+      .populate('user', 'name email')
+      .populate('restaurant', 'name')
+      .populate('items.menuItem', 'name price')
       .lean();
 
     res.status(200).json(orders);
@@ -68,26 +68,24 @@ export const getOrders = async (req, res) => {
 
 export const getOrderById = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id)
-      .populate("user", "name email")
-      .populate("restaurant", "name")
-      .populate("items.menuItem", "name price")
-      .lean();
-
-    if (!order) {
-      return res.status(404).json({
-        message: "Order not found",
+    const rawOrder = await Order.findById(req.params.id).lean();
+    if (!rawOrder) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+    if (rawOrder.user?.toString() !== (req.user._id?.toString() || req.user.id?.toString())) {
+      return res.status(403).json({
+        message: 'Order does not belong to this user',
       });
     }
-
-    res.status(200).json(order);
-
+    const order = await Order.findById(req.params.id)
+      .populate('restaurant', 'name')
+      .populate('items.menuItem', 'name price')
+      .populate('user', 'name email')
+      .lean();
+    return res.status(200).json(order);
   } catch (error) {
-    console.error("GET ORDER ERROR:", error);
-
-    res.status(500).json({
-      message: "Failed to fetch order",
-    });
+    console.error('GET ORDER BY ID ERROR:', error);
+    res.status(500).json({ message: 'Failed to fetch order' });
   }
 };
 
@@ -122,7 +120,9 @@ export const updateOrderStatus = async (req, res) => {
       });
     }
 
-    res.status(200).json(updatedOrder);
+        // Emit real-time status update to the customer
+        emitOrderStatus(updatedOrder._id, updatedOrder.status, updatedOrder.user.toString());
+        res.status(200).json(updatedOrder);
 
   } catch (error) {
     console.error("UPDATE ORDER STATUS ERROR:", error);

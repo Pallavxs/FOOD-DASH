@@ -17,6 +17,7 @@ import AuthFormCard from "../../components/AuthFormCard";
 import CustomInput from "../../components/CustomInput";
 import PrimaryButton from "../../components/PrimaryButton";
 import { login } from "../../redux/actions/authActions";
+import { initSocket } from "../../services/socketService";
 
 const { height } = Dimensions.get("window");
 
@@ -34,6 +35,8 @@ export default function LoginScreen() {
 
   useEffect(() => {
     if (user) {
+      // Initialize socket connection with authenticated user ID
+      initSocket(user._id);
       router.replace("/tabs/home");
     }
   }, [user]);
