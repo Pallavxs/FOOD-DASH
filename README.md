@@ -123,14 +123,3 @@ c:/Intern Project/
 8. **Track Order** – Shows order details and a live status badge that updates via Socket.IO.
 9. **Profile** – Allows viewing/editing user info and logging out (socket disconnect).
 
-## Future Improvements
-
-- Add unit & integration tests (Jest, React Native Testing Library).
-- Introduce a theming system or design tokens for easier UI scaling.
-- Implement push‑notification support for order status updates.
-- Optimize image handling and caching for low‑bandwidth devices.
-- Refactor duplicated style keys into a shared style module if the project grows.
-
----
-
-*Prepared for interview showcase – concise, professional, and ready to demonstrate a production‑ready React Native food‑delivery app.*

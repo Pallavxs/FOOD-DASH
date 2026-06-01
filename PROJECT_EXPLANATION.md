@@ -57,6 +57,3 @@
 - The exported helper `onOrderStatusUpdated(callback)` registers a listener; before each registration the previous listener is removed with `socket.off` to avoid duplicates.
 - On **Logout** the socket is explicitly disconnected via `socket.disconnect()`.
 
----
-
-*This document explains the core architecture in plain language, ideal for interview discussions.*

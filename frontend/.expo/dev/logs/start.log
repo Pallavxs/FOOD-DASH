@@ -3498,3 +3498,34 @@
 {"_e":"metro:client_log","_t":1780245305443,"level":"log","data":["Search Results:","[{\"_id\": \"6a1ab2149f6f8f2a3b4b925b\", \"cuisine\": \"Hyderabadi\", \"deliveryTime\": 30, \"image\": \"https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=800\", \"location\": \"Hyderabad\", \"name\": \"Biryani Bazaar\", \"rating\": \"4.9\"}]"]}
 {"_e":"metro:client_log","_t":1780245306526,"level":"log","data":["Searching:","Biryan"]}
 {"_e":"metro:client_log","_t":1780245306574,"level":"log","data":["Search Results:","[{\"_id\": \"6a1ab2149f6f8f2a3b4b925b\", \"cuisine\": \"Hyderabadi\", \"deliveryTime\": 30, \"image\": \"https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=800\", \"location\": \"Hyderabad\", \"name\": \"Biryani Bazaar\", \"rating\": \"4.9\"}]"]}
+{"_e":"metro:bundling:started","_t":1780247325590,"id":"g","platform":"android","environment":null,"entry":"node_modules\\expo-router\\entry.js"}
+{"_e":"metro:bundling:progress","_t":1780247325594,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247325632,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247326109,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247326355,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247326457,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247326557,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247326659,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247326759,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247326860,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247326960,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247327078,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247327180,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247327280,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247327380,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247327481,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247327582,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247327685,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247327785,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247327885,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247327985,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247328122,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247328232,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247328341,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247328494,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247328822,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247331254,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247331500,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247331602,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1780247331826,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1780247332038,"id":"g","total":1,"ms":6444.3616}
